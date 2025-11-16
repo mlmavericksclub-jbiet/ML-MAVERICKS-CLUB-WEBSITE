@@ -1,0 +1,53 @@
+<!-- 
+  This is a reusable component.
+  (FIXED) - Corrected a 'class_name' typo that was breaking the mobile menu.
+-->
+<nav class="fixed top-0 left-0 w-full z-50 bg-brand-dark/50 backdrop-blur-md border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            
+            <!-- Logo / Club Title -->
+            <a href="index.html" class="flex items-center space-x-3 flex-shrink-0">
+                <i data-lucide="brain-circuit" class="h-10 w-10 text-brand-cyan"></i>
+                <span class="font-display text-xl tracking-wider text-white">
+                    ML MAVERICKS CLUB
+                </span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <div class="hidden md:flex items-center space-x-2">
+                <a href="index.html" class="nav-link relative px-4 py-2 rounded-md text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-brand-cyan" data-nav-id="index.html">Home</a>
+                <a href="visionaries.html" class="nav-link relative px-4 py-2 rounded-md text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-brand-cyan" data-nav-id="visionaries.html">Visionaries</a>
+                <a href="#" class="nav-link relative px-4 py-2 rounded-md text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-brand-cyan" data-nav-id="team.html">Team</a>
+                <a href="#" class="nav-link relative px-4 py-2 rounded-md text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-brand-cyan" data-nav-id="showcase.html">Showcase</a>
+                <a href="leaderboard.html" class="nav-link relative px-4 py-2 rounded-md text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-brand-cyan" data-nav-id="leaderboard.html">Leaderboard</a>
+                <a href="events.html" 
+                   class="inline-block px-5 py-2 bg-brand-cyan text-black font-bold rounded-lg transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-brand-cyan/50"
+                   data-nav-id="events.html">
+                    Events
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-btn" class="p-2 rounded-md text-gray-400 hover:text-white">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Mobile Menu (Dropdown) -->
+        <!-- (FIXED) Changed 'class_name=' to 'class=' -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 w-full bg-brand-gray shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-brand-cyan hover:bg-gray-800 transition-all duration-200" data-nav-id="index.html">Home</a>
+                <a href="visionaries.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-brand-cyan hover:bg-gray-800 transition-all duration-200" data-nav-id="visionaries.html">Visionaries</a>
+                <a href="team.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-brand-cyan hover:bg-gray-800 transition-all duration-200" data-nav-id="team.html">Team</a>
+                <a href="showcase.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-brand-cyan hover:bg-gray-800 transition-all duration-200" data-nav-id="showcase.html">Showcase</a>
+                <a href="leaderboard.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-brand-cyan hover:bg-gray-800 transition-all duration-200" data-nav-id="leaderboard.html">Leaderboard</a>
+                <a href="events.html" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium bg-brand-cyan text-black font-bold" data-nav-id="events.html">Events</a>
+            </div>
+        </div>
+    </div>
+</nav>
