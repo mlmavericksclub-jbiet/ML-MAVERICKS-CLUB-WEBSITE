@@ -184,21 +184,32 @@ function attachNavbarLogic() {
 // ---
 // 6. PAYMENT MODAL & FORM SUBMISSION (Events Page)
 // ---
+// 
+
+// ==========================================
+// NEW EVENT FORM LOGIC (WITH LIMIT CHECK)
+// ==========================================
 function initEventForm() {
     const registrationForm = document.getElementById('registration-form');
-    if (!registrationForm) return; // Exit if not on events page
+    if (!registrationForm) return; 
 
-    // -------------------------------------------------------------------
-    // !! IMPORTANT !!
-    // Replace this URL with the Web App URL you got from Google Apps Script.
+    // ------------------------------------------------------
+    // PASTE YOUR NEW GOOGLE SCRIPT URL HERE:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWChbT5gcs7Cf3oNZKpVrZJmFQe8NN3ot2oMVipsta4fnZ-bL4pimx0yIiZ69A9MN7bA/exec"; 
-    // -------------------------------------------------------------------
+    // ------------------------------------------------------
+    const MAX_PARTICIPANTS = 5;
 
+    // DOM Elements
+    const loadingState = document.getElementById('loading-state');
+    const formContainer = document.getElementById('form-container');
+    const closedMessage = document.getElementById('closed-message');
+    const spotCountSpan = document.getElementById('spot-count');
+    
+    // Modal Elements
     const modal = document.getElementById('payment-modal');
     const modalOverlay = document.querySelector('.modal-overlay');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const modalFormMessage = document.getElementById('modal-form-message');
-    
     const transactionForm = document.getElementById('transaction-form');
     const screenshotInput = document.getElementById('paymentScreenshot');
     const submitBtn = document.getElementById('submit-registration-btn');
@@ -206,7 +217,33 @@ function initEventForm() {
     
     let registrationData = {};
 
-    // --- Step 1: User fills main form and clicks "Proceed" ---
+    // --- 1. CHECK COUNT ON LOAD ---
+    fetch(SCRIPT_URL + "?action=getCount")
+        .then(response => response.json())
+        .then(data => {
+            const count = data.count;
+            // Update UI
+            if(loadingState) loadingState.classList.add('hidden');
+
+            if (count >= MAX_PARTICIPANTS) {
+                // LIMIT REACHED
+                if(closedMessage) closedMessage.classList.remove('hidden');
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            } else {
+                // SPOTS AVAILABLE
+                if(formContainer) formContainer.classList.remove('hidden');
+                if(spotCountSpan) spotCountSpan.innerText = count;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching count:', error);
+            // Fallback: show form if error occurs
+            if(loadingState) loadingState.classList.add('hidden');
+            if(formContainer) formContainer.classList.remove('hidden');
+        });
+
+
+    // --- 2. FORM HANDLERS (Same as before) ---
     registrationForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(registrationForm);
@@ -214,44 +251,30 @@ function initEventForm() {
         openModal();
     });
 
-    // --- Step 2: User fills modal form and clicks "Submit Registration" ---
     transactionForm.addEventListener('submit', (e) => {
         e.preventDefault();
-
         const file = screenshotInput.files[0];
 
         if (!file) {
-            showModalMessage('Please upload a payment screenshot.', 'error');
+            showModalMessage('Please upload a screenshot.', 'error');
             return;
         }
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            showModalMessage('File is too large. Max size is 5MB.', 'error');
+        if (file.size > 5 * 1024 * 1024) { 
+            showModalMessage('File too large (Max 5MB).', 'error');
             return;
         }
 
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="loader"></span> Submitting...';
-        lucide.createIcons();
         modalFormMessage.classList.add('hidden');
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        
         reader.onload = () => {
-            const base64File = reader.result;
-            
-            registrationData.fileData = base64File;
+            registrationData.fileData = reader.result;
             registrationData.fileName = file.name;
             registrationData.fileType = file.type;
-
             sendDataToGoogleScript(registrationData);
-        };
-        
-        reader.onerror = (error) => {
-            console.error('File reading error:', error);
-            showModalMessage('Error reading file. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Submit Registration';
         };
     });
     
@@ -263,70 +286,52 @@ function initEventForm() {
           body: JSON.stringify(data),
         })
         .then(response => {
-          showModalMessage('Registration Successful! You will receive a confirmation email soon.', 'success');
+          showModalMessage('Registration Successful! Refreshing...', 'success');
           registrationForm.reset();
           transactionForm.reset();
-          setTimeout(closeModal, 3000);
+          setTimeout(() => {
+              closeModal();
+              location.reload(); // Reload to update the count
+          }, 2000);
         })
         .catch(error => {
-          console.error('Fetch error:', error);
-          showModalMessage('An error occurred. Please try again.', 'error');
-        })
-        .finally(() => {
+          showModalMessage('Error occurred. Please try again.', 'error');
           submitBtn.disabled = false;
           submitBtn.innerHTML = 'Submit Registration';
         });
     }
 
-    function openModal() {
-        if (modal) modal.classList.remove('hidden');
-    }
-    
-    function closeModal() {
+    function openModal() { if (modal) modal.classList.remove('hidden'); }
+    function closeModal() { 
         if (modal) {
             modal.classList.add('hidden');
             transactionForm.reset();
             modalFormMessage.classList.add('hidden');
-
         }
     }
     
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
     if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
 
+    // Copy UPI Logic
     if (copyUpiBtn) {
         copyUpiBtn.addEventListener('click', () => {
             const upiId = document.getElementById('upi-id').innerText;
-            
-            const tempInput = document.createElement('input');
-            tempInput.value = upiId;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            try {
-              document.execCommand('copy');
-              copyUpiBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
-              setTimeout(() => {
-                  copyUpiBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
-                  lucide.createIcons();
-              }, 2000);
-            } catch (err) {
-              console.error('Failed to copy UPI ID');
-            }
-            document.body.removeChild(tempInput);
-            lucide.createIcons();
+            navigator.clipboard.writeText(upiId);
+            copyUpiBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
+            setTimeout(() => {
+                copyUpiBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            }, 2000);
+            if(typeof lucide !== 'undefined') lucide.createIcons();
         });
     }
 
     function showModalMessage(message, type = 'success') {
         const messageEl = modalFormMessage;
         messageEl.innerText = message;
-        messageEl.className = 'p-3 rounded-lg text-sm mt-4 text-center'; 
-        
-        if (type === 'success') {
-            messageEl.classList.add('bg-green-800', 'text-green-200');
-        } else {
-            messageEl.classList.add('bg-red-800', 'text-red-200');
-        }
+        messageEl.className = 'p-3 rounded-lg text-sm mt-4 text-center ' + 
+            (type === 'success' ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-200');
         messageEl.classList.remove('hidden');
     }
 }
