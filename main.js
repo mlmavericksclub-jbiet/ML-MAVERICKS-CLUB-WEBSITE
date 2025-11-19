@@ -195,7 +195,7 @@ function initEventForm() {
 
     // ------------------------------------------------------
     // PASTE YOUR NEW GOOGLE SCRIPT URL HERE:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWChbT5gcs7Cf3oNZKpVrZJmFQe8NN3ot2oMVipsta4fnZ-bL4pimx0yIiZ69A9MN7bA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdeJORA7i2S1ss2GdsDYiU88YyyTBLQfz7jOiTGVXKrb44nhUgQ7VAsD3YfVwpOhY/exec"; 
     // ------------------------------------------------------
     const MAX_PARTICIPANTS = 5;
 
