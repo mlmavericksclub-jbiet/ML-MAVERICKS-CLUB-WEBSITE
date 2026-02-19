@@ -1,20 +1,12 @@
+// https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec
+
 /*
  * -----------------------------------------------------------------------------
  * ML MAVERICKS - MAIN.JS (v2.0 - Multi-Page)
  * -----------------------------------------------------------------------------
- * This file contains all JavaScript for the website:
- * 1. Component Loader (Navbar/Footer)
- * 2. Active Nav Link Highlighter
- * 3. 3D Neural Network (Homepage Hero)
- * 4. 3D Tilt Effect (Homepage & Showcase Cards)
- * 5. Payment Modal & Form Submission (Events Page)
- * -----------------------------------------------------------------------------
  */
 
-// ---
-// 1. COMPONENT LOADER
-// ---
-// This function fetches and injects reusable HTML (navbar.html, footer.html)
+// --- 1. COMPONENT LOADER ---
 async function loadComponents() {
     const elements = document.querySelectorAll('[data-include]');
     for (const el of elements) {
@@ -31,10 +23,7 @@ async function loadComponents() {
     }
 }
 
-// ---
-// 2. ACTIVE NAV LINK HIGHLIGHTER
-// ---
-// This highlights the nav link for the current page
+// --- 2. ACTIVE NAV LINK HIGHLIGHTER ---
 function highlightActiveNav() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll(`[data-nav-id]`);
@@ -47,13 +36,10 @@ function highlightActiveNav() {
     });
 }
 
-// ---
-// 3. 3D NEURAL NETWORK (Homepage Hero)
-// ---
-// We only run this if we're on the homepage (index.html)
+// --- 3. 3D NEURAL NETWORK (Homepage Hero) ---
 function initNeuralNetwork() {
     const container = document.getElementById('neural-canvas-container');
-    if (!container || typeof THREE === 'undefined') return; // Exit if not homepage or three.js not loaded
+    if (!container || typeof THREE === 'undefined') return; 
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -142,26 +128,16 @@ function initNeuralNetwork() {
     });
 }
 
-// ---
-// 4. 3D TILT EFFECT (Homepage & Showcase Cards)
-// ---
+// --- 4. 3D TILT EFFECT ---
 function initTiltEffect() {
     if (typeof VanillaTilt === 'undefined') return;
-
     const tiltElements = document.querySelectorAll('.tilt-card, .tilt-card-project');
     if (tiltElements.length > 0) {
-        VanillaTilt.init(tiltElements, {
-            max: 15,
-            speed: 400,
-            glare: true,
-            "max-glare": 0.25
-        });
+        VanillaTilt.init(tiltElements, { max: 15, speed: 400, glare: true, "max-glare": 0.25 });
     }
 }
 
-// ---
-// 5. NAVBAR MOBILE MENU LOGIC
-// ---
+// --- 5. NAVBAR MOBILE MENU LOGIC ---
 function attachNavbarLogic() {
     const btn = document.getElementById('mobile-menu-btn');
     const menu = document.getElementById('mobile-menu');
@@ -177,128 +153,135 @@ function attachNavbarLogic() {
             lucide.createIcons();
         });
     }
-    // Also highlight the active nav link
     highlightActiveNav();
 }
 
-// ---
-// 6. PAYMENT MODAL & FORM SUBMISSION (Events Page)
-// ---
-// 
-function initEventForm() {
-    const registrationForm = document.getElementById('registration-form');
-    if (!registrationForm) return; // Exit if not on events page
+// --- 6. MULTI-EVENT REGISTRATION LOGIC (Events Page) ---
+function initEventsPage() {
+    const eventBtns = document.querySelectorAll('.event-btn');
+    if(eventBtns.length === 0) return; 
 
-    // -------------------------------------------------------------------
-    // !! IMPORTANT !!
-    // Replace this URL with the Web App URL you got from Google Apps Script.
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWChbT5gcs7Cf3oNZKpVrZJmFQe8NN3ot2oMVipsta4fnZ-bL4pimx0yIiZ69A9MN7bA/exec"; 
-    // -------------------------------------------------------------------
-
-    const modal = document.getElementById('payment-modal');
-    const modalOverlay = document.querySelector('.modal-overlay');
-    const closeModalBtn = document.getElementById('close-modal-btn');
-    const modalFormMessage = document.getElementById('modal-form-message');
+    // Containers
+    const eventListContainer = document.getElementById('event-list-container');
+    const eventPosterContainer = document.getElementById('event-poster-container');
+    const mainPosterContainer = document.getElementById('main-poster-container');
+    const formContainer = document.getElementById('form-container');
+    const regClosedContainer = document.getElementById('registration-closed-container');
     
-    const transactionForm = document.getElementById('transaction-form');
-    const screenshotInput = document.getElementById('paymentScreenshot');
-    const submitBtn = document.getElementById('submit-registration-btn');
-    const copyUpiBtn = document.getElementById('copy-upi-btn');
+    // UI Elements
+    const backBtn = document.getElementById('back-btn');
+    const dynamicPoster = document.getElementById('dynamic-event-poster');
+    const eventTitle = document.getElementById('form-event-title');
+    const eventDate = document.getElementById('form-event-date');
+    const eventType = document.getElementById('form-event-type');
+    const selectedEventId = document.getElementById('selected-event-id');
     
-    let registrationData = {};
+    const academicFields = document.getElementById('academic-fields');
+    const yearSelect = document.getElementById('year');
+    const branchSelect = document.getElementById('branch');
 
-    // --- Step 1: User fills main form and clicks "Proceed" ---
-    registrationForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(registrationForm);
-        registrationData = Object.fromEntries(formData.entries());
-        openModal();
-    });
+    // IMPORTANT: Make sure these names match your actual image files exactly
+    const posterImages = {
+        'smash-karts': 'smash.png',
+        'dart-game': 'dart.png',
+        'tech-tambola': 'tambola.png',
+        'neuro-debugs': 'neuro.png'
+    };
 
-    // --- Step 2: User fills modal form and clicks "Submit Registration" ---
-    transactionForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // 1. Handle Selection & Swap Layout
+    eventBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const eventId = btn.getAttribute('data-event');
+            const isFaculty = btn.getAttribute('data-type') === 'Faculty';
 
-        const file = screenshotInput.files[0];
+            eventTitle.innerText = btn.getAttribute('data-title');
+            eventDate.innerText = btn.getAttribute('data-date');
+            eventType.innerText = btn.getAttribute('data-type');
+            selectedEventId.value = eventId;
+            dynamicPoster.src = posterImages[eventId] || '';
 
-        if (!file) {
-            showModalMessage('Please upload a payment screenshot.', 'error');
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            showModalMessage('File is too large. Max size is 5MB.', 'error');
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loader"></span> Submitting...';
-        lucide.createIcons();
-        modalFormMessage.classList.add('hidden');
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        
-        reader.onload = () => {
-            const base64File = reader.result;
+            eventListContainer.classList.add('hidden');
+            eventListContainer.classList.remove('block');
+            mainPosterContainer.classList.add('hidden');
+            mainPosterContainer.classList.remove('flex');
             
-            registrationData.fileData = base64File;
-            registrationData.fileName = file.name;
-            registrationData.fileType = file.type;
+            eventPosterContainer.classList.remove('hidden');
+            eventPosterContainer.classList.add('flex');
 
-            sendDataToGoogleScript(registrationData);
-        };
-        
-        reader.onerror = (error) => {
-            console.error('File reading error:', error);
-            showModalMessage('Error reading file. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Submit Registration';
-        };
+            if (eventId === 'neuro-debugs') {
+                formContainer.classList.add('hidden');
+                regClosedContainer.classList.remove('hidden');
+                regClosedContainer.classList.add('flex');
+            } else {
+                regClosedContainer.classList.add('hidden');
+                regClosedContainer.classList.remove('flex');
+                formContainer.classList.remove('hidden');
+
+                if (isFaculty) {
+                    yearSelect.value = "Faculty";
+                    branchSelect.value = "Faculty";
+                    academicFields.classList.add('hidden');
+                    yearSelect.removeAttribute('required');
+                    branchSelect.removeAttribute('required');
+                } else {
+                    yearSelect.value = "";
+                    branchSelect.value = "";
+                    academicFields.classList.remove('hidden');
+                    yearSelect.setAttribute('required', 'true');
+                    branchSelect.setAttribute('required', 'true');
+                }
+            }
+        });
     });
+
+    // 2. Handle Back Button Click
+    backBtn.addEventListener('click', () => {
+        eventPosterContainer.classList.add('hidden');
+        eventPosterContainer.classList.remove('flex');
+        
+        formContainer.classList.add('hidden');
+        regClosedContainer.classList.add('hidden');
+        regClosedContainer.classList.remove('flex');
+
+        eventListContainer.classList.remove('hidden');
+        eventListContainer.classList.add('block');
+        
+        mainPosterContainer.classList.remove('hidden');
+        mainPosterContainer.classList.add('flex');
+    });
+
+    // 3. Modal logic & Proceed Validation
+    const proceedBtn = document.getElementById('proceed-btn');
+    const regForm = document.getElementById('registration-form');
+    const paymentModal = document.getElementById('payment-modal');
     
-    function sendDataToGoogleScript(data) {
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', 
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        })
-        .then(response => {
-          showModalMessage('Registration Successful! You will receive a confirmation email soon.', 'success');
-          registrationForm.reset();
-          transactionForm.reset();
-          setTimeout(closeModal, 3000);
-        })
-        .catch(error => {
-          console.error('Fetch error:', error);
-          showModalMessage('An error occurred. Please try again.', 'error');
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Submit Registration';
+    if(proceedBtn) {
+        proceedBtn.addEventListener('click', () => {
+            if (regForm.checkValidity()) paymentModal.classList.remove('hidden');
+            else regForm.reportValidity();
         });
     }
 
-    function openModal() {
-        if (modal) modal.classList.remove('hidden');
+    // Modal Close Functions (Hides the message box as well)
+    function closePaymentModal() {
+        paymentModal.classList.add('hidden');
+        const msgBox = document.getElementById('modal-form-message');
+        if (msgBox) msgBox.classList.add('hidden');
+    }
+
+    document.getElementById('close-modal-btn').addEventListener('click', closePaymentModal);
+    
+    // Also close modal if clicking the dark background overlay
+    const modalOverlay = paymentModal.querySelector('.fixed.inset-0.bg-black\\/80');
+    if(modalOverlay) {
+        modalOverlay.addEventListener('click', closePaymentModal);
     }
     
-    function closeModal() {
-        if (modal) {
-            modal.classList.add('hidden');
-            transactionForm.reset();
-            modalFormMessage.classList.add('hidden');
-
-        }
-    }
-    
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
-
+    // Copy UPI
+    const copyUpiBtn = document.getElementById('copy-upi-btn');
     if (copyUpiBtn) {
         copyUpiBtn.addEventListener('click', () => {
             const upiId = document.getElementById('upi-id').innerText;
-            
             const tempInput = document.createElement('input');
             tempInput.value = upiId;
             document.body.appendChild(tempInput);
@@ -310,197 +293,125 @@ function initEventForm() {
                   copyUpiBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
                   lucide.createIcons();
               }, 2000);
-            } catch (err) {
-              console.error('Failed to copy UPI ID');
-            }
+            } catch (err) {}
             document.body.removeChild(tempInput);
             lucide.createIcons();
         });
     }
 
-    function showModalMessage(message, type = 'success') {
-        const messageEl = modalFormMessage;
-        messageEl.innerText = message;
-        messageEl.className = 'p-3 rounded-lg text-sm mt-4 text-center'; 
-        
-        if (type === 'success') {
-            messageEl.classList.add('bg-green-800', 'text-green-200');
-        } else {
-            messageEl.classList.add('bg-red-800', 'text-red-200');
-        }
-        messageEl.classList.remove('hidden');
+    // 4. Final Form Submission (Google Sheets + Drive)
+    const finalSubmitForm = document.getElementById('final-submit-form');
+    
+    // IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT URLs
+    const eventScriptURLs = {
+        'smash-karts': 'https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec',
+        'dart-game': 'YOUR_GOOGLE_SCRIPT_URL_FOR_DART_GAME',
+        'tech-tambola': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
+    };
+
+    if(finalSubmitForm) {
+        finalSubmitForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const eventId = selectedEventId.value;
+            const scriptURL = eventScriptURLs[eventId];
+            
+            if (!scriptURL || scriptURL.includes('YOUR_GOOGLE_SCRIPT_URL')) {
+                alert('Configuration Error: Google Script URL is missing for this event.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('final-submit-btn');
+            const submitText = document.getElementById('final-submit-text');
+            const spinner = document.getElementById('final-submit-spinner');
+            const msgBox = document.getElementById('modal-form-message');
+
+            submitBtn.disabled = true;
+            submitText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            msgBox.classList.add('hidden');
+
+            const fileInput = document.getElementById('paymentScreenshot');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async function() {
+                const base64String = reader.result.split(',')[1];
+                
+                const payload = {
+                    event: eventId,
+                    name: document.getElementById('name').value,
+                    rollNumber: document.getElementById('rollNumber').value,
+                    college: document.getElementById('collegeName').value,
+                    year: document.getElementById('year').value,
+                    branch: document.getElementById('branch').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    transactionId: document.getElementById('transactionId').value,
+                    fileName: file.name,
+                    mimeType: file.type,
+                    fileBase64: base64String
+                };
+
+                try {
+                    // Send with no-cors to prevent browser security blocks
+                    await fetch(scriptURL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    // --- SUCCESS STATE (Requires Manual Close) ---
+                    msgBox.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <i data-lucide="check-circle" class="w-10 h-10 text-green-500 mb-2"></i>
+                            <span class="font-bold text-lg">Registration Successful!</span>
+                            <span class="text-xs text-green-200 mt-1">Your details have been securely recorded. You may close this window.</span>
+                        </div>
+                    `;
+                    msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
+                    lucide.createIcons();
+                    
+                    // Reset forms in the background
+                    regForm.reset();
+                    finalSubmitForm.reset();
+                    backBtn.click(); // Reset the background UI to list view
+                    
+                    // Note: No setTimeout here. Modal stays open until user clicks 'X'.
+
+                } catch (error) {
+                    console.error(error);
+                    // --- ERROR STATE (Requires Manual Close) ---
+                    msgBox.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <i data-lucide="alert-circle" class="w-10 h-10 text-red-500 mb-2"></i>
+                            <span class="font-bold text-lg">Form Not Submitted</span>
+                            <span class="text-xs text-red-200 mt-1">Please check your internet connection and try again.</span>
+                        </div>
+                    `;
+                    msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-red-900/60 border border-red-500 text-red-100 block";
+                    lucide.createIcons();
+                } finally {
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        });
     }
 }
 
-// ==========================================
-// NEW EVENT FORM LOGIC (WITH LIMIT CHECK)
-// ==========================================
-// function initEventForm() {
-//     const registrationForm = document.getElementById('registration-form');
-//     if (!registrationForm) return; 
-
-//     // ------------------------------------------------------
-//     // PASTE YOUR NEW GOOGLE SCRIPT URL HERE:
-//     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdeJORA7i2S1ss2GdsDYiU88YyyTBLQfz7jOiTGVXKrb44nhUgQ7VAsD3YfVwpOhY/exec"; 
-//     // ------------------------------------------------------
-//     const MAX_PARTICIPANTS = 5;
-
-//     // DOM Elements
-//     const loadingState = document.getElementById('loading-state');
-//     const formContainer = document.getElementById('form-container');
-//     const closedMessage = document.getElementById('closed-message');
-//     const spotCountSpan = document.getElementById('spot-count');
-    
-//     // Modal Elements
-//     const modal = document.getElementById('payment-modal');
-//     const modalOverlay = document.querySelector('.modal-overlay');
-//     const closeModalBtn = document.getElementById('close-modal-btn');
-//     const modalFormMessage = document.getElementById('modal-form-message');
-//     const transactionForm = document.getElementById('transaction-form');
-//     const screenshotInput = document.getElementById('paymentScreenshot');
-//     const submitBtn = document.getElementById('submit-registration-btn');
-//     const copyUpiBtn = document.getElementById('copy-upi-btn');
-    
-//     let registrationData = {};
-
-//     // --- 1. CHECK COUNT ON LOAD ---
-//     fetch(SCRIPT_URL + "?action=getCount")
-//         .then(response => response.json())
-//         .then(data => {
-//             const count = data.count;
-//             // Update UI
-//             if(loadingState) loadingState.classList.add('hidden');
-
-//             if (count >= MAX_PARTICIPANTS) {
-//                 // LIMIT REACHED
-//                 if(closedMessage) closedMessage.classList.remove('hidden');
-//                 if(typeof lucide !== 'undefined') lucide.createIcons();
-//             } else {
-//                 // SPOTS AVAILABLE
-//                 if(formContainer) formContainer.classList.remove('hidden');
-//                 if(spotCountSpan) spotCountSpan.innerText = count;
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error fetching count:', error);
-//             // Fallback: show form if error occurs
-//             if(loadingState) loadingState.classList.add('hidden');
-//             if(formContainer) formContainer.classList.remove('hidden');
-//         });
-
-
-//     // --- 2. FORM HANDLERS (Same as before) ---
-//     registrationForm.addEventListener('submit', (e) => {
-//         e.preventDefault();
-//         const formData = new FormData(registrationForm);
-//         registrationData = Object.fromEntries(formData.entries());
-//         openModal();
-//     });
-
-//     transactionForm.addEventListener('submit', (e) => {
-//         e.preventDefault();
-//         const file = screenshotInput.files[0];
-
-//         if (!file) {
-//             showModalMessage('Please upload a screenshot.', 'error');
-//             return;
-//         }
-//         if (file.size > 5 * 1024 * 1024) { 
-//             showModalMessage('File too large (Max 5MB).', 'error');
-//             return;
-//         }
-
-//         submitBtn.disabled = true;
-//         submitBtn.innerHTML = '<span class="loader"></span> Submitting...';
-//         modalFormMessage.classList.add('hidden');
-
-//         const reader = new FileReader();
-//         reader.readAsDataURL(file);
-//         reader.onload = () => {
-//             registrationData.fileData = reader.result;
-//             registrationData.fileName = file.name;
-//             registrationData.fileType = file.type;
-//             sendDataToGoogleScript(registrationData);
-//         };
-//     });
-    
-//     function sendDataToGoogleScript(data) {
-//         fetch(SCRIPT_URL, {
-//           method: 'POST',
-//           mode: 'no-cors', 
-//           headers: { 'Content-Type': 'application/json' },
-//           body: JSON.stringify(data),
-//         })
-//         .then(response => {
-//           showModalMessage('Registration Successful! Refreshing...', 'success');
-//           registrationForm.reset();
-//           transactionForm.reset();
-//           setTimeout(() => {
-//               closeModal();
-//               location.reload(); // Reload to update the count
-//           }, 2000);
-//         })
-//         .catch(error => {
-//           showModalMessage('Error occurred. Please try again.', 'error');
-//           submitBtn.disabled = false;
-//           submitBtn.innerHTML = 'Submit Registration';
-//         });
-//     }
-
-//     function openModal() { if (modal) modal.classList.remove('hidden'); }
-//     function closeModal() { 
-//         if (modal) {
-//             modal.classList.add('hidden');
-//             transactionForm.reset();
-//             modalFormMessage.classList.add('hidden');
-//         }
-//     }
-    
-//     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-//     if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
-
-//     // Copy UPI Logic
-//     if (copyUpiBtn) {
-//         copyUpiBtn.addEventListener('click', () => {
-//             const upiId = document.getElementById('upi-id').innerText;
-//             navigator.clipboard.writeText(upiId);
-//             copyUpiBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-500"></i>';
-//             setTimeout(() => {
-//                 copyUpiBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
-//                 if(typeof lucide !== 'undefined') lucide.createIcons();
-//             }, 2000);
-//             if(typeof lucide !== 'undefined') lucide.createIcons();
-//         });
-//     }
-
-//     function showModalMessage(message, type = 'success') {
-//         const messageEl = modalFormMessage;
-//         messageEl.innerText = message;
-//         messageEl.className = 'p-3 rounded-lg text-sm mt-4 text-center ' + 
-//             (type === 'success' ? 'bg-green-800 text-green-200' : 'bg-red-800 text-red-200');
-//         messageEl.classList.remove('hidden');
-//     }
-// }
-
-
-/*
- * -----------------------------------------------------------------------------
- * INITIALIZATION
- * -----------------------------------------------------------------------------
- * Run all our functions when the page loads.
- */
+// --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Load Navbar/Footer first
     await loadComponents();
-    
-    // 2. Attach logic to the newly loaded Navbar
     attachNavbarLogic(); 
-    
-    // 3. Render all icons
     lucide.createIcons();
-    
-    // 4. Initialize page-specific scripts
-    initNeuralNetwork();   // Will only run on index.html
-    initTiltEffect();      // Will run on index.html and showcase.html
-    initEventForm();       // Will only run on events.html
+    initNeuralNetwork();   
+    initTiltEffect();      
+    initEventsPage();      
 });
