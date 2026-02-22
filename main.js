@@ -1,5 +1,3 @@
-// https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec
-
 /*
  * -----------------------------------------------------------------------------
  * ML MAVERICKS - MAIN.JS (v2.0 - Multi-Page)
@@ -36,7 +34,7 @@ function highlightActiveNav() {
     });
 }
 
-// --- 3. 3D NEURAL NETWORK (Homepage Hero) ---
+// --- 3. 3D NEURAL NETWORK ---
 function initNeuralNetwork() {
     const container = document.getElementById('neural-canvas-container');
     if (!container || typeof THREE === 'undefined') return; 
@@ -156,7 +154,7 @@ function attachNavbarLogic() {
     highlightActiveNav();
 }
 
-// --- 6. MULTI-EVENT REGISTRATION LOGIC (Events Page) ---
+// --- 6. MULTI-EVENT REGISTRATION LOGIC ---
 function initEventsPage() {
     const eventBtns = document.querySelectorAll('.event-btn');
     if(eventBtns.length === 0) return; 
@@ -176,15 +174,16 @@ function initEventsPage() {
     const eventType = document.getElementById('form-event-type');
     const selectedEventId = document.getElementById('selected-event-id');
     
-    const academicFields = document.getElementById('academic-fields');
-    const yearSelect = document.getElementById('year');
-    const branchSelect = document.getElementById('branch');
-
-    // IMPORTANT: Make sure these names match your actual image files exactly
+    // Dynamic Form Sections
+    const studentFields = document.getElementById('student-fields');
+    const facultyFields = document.getElementById('faculty-fields');
+    const proceedBtnText = document.getElementById('proceed-btn-text');
+    const proceedBtnIcon = document.getElementById('proceed-btn-icon');
+    
     const posterImages = {
         'smash-karts': 'smash.png',
         'dart-game': 'dart.png',
-        'tech-tambola': 'tambola.png',
+        'Think_&_Ink': 'tambola.png',
         'neuro-debugs': 'neuro.png'
     };
 
@@ -192,7 +191,6 @@ function initEventsPage() {
     eventBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const eventId = btn.getAttribute('data-event');
-            const isFaculty = btn.getAttribute('data-type') === 'Faculty';
 
             eventTitle.innerText = btn.getAttribute('data-title');
             eventDate.innerText = btn.getAttribute('data-date');
@@ -217,18 +215,38 @@ function initEventsPage() {
                 regClosedContainer.classList.remove('flex');
                 formContainer.classList.remove('hidden');
 
-                if (isFaculty) {
-                    yearSelect.value = "Faculty";
-                    branchSelect.value = "Faculty";
-                    academicFields.classList.add('hidden');
-                    yearSelect.removeAttribute('required');
-                    branchSelect.removeAttribute('required');
+                // DART GAME: Faculty Only
+                if (eventId === 'dart-game') {
+                    // Hide Student Fields
+                    studentFields.classList.add('hidden');
+                    document.getElementById('rollNumber').removeAttribute('required');
+                    document.getElementById('collegeName').removeAttribute('required');
+                    document.getElementById('year').removeAttribute('required');
+                    document.getElementById('branch').removeAttribute('required');
+                    
+                    // Show Faculty Fields
+                    facultyFields.classList.remove('hidden');
+                    document.getElementById('departmentName').setAttribute('required', 'true');
+                    
+                    // Change Button State
+                    proceedBtnText.innerText = "Submit Registration";
+                    proceedBtnIcon.setAttribute('data-lucide', 'check-circle');
+                    lucide.createIcons();
+
                 } else {
-                    yearSelect.value = "";
-                    branchSelect.value = "";
-                    academicFields.classList.remove('hidden');
-                    yearSelect.setAttribute('required', 'true');
-                    branchSelect.setAttribute('required', 'true');
+                    // STUDENTS: All other events
+                    studentFields.classList.remove('hidden');
+                    document.getElementById('rollNumber').setAttribute('required', 'true');
+                    document.getElementById('collegeName').setAttribute('required', 'true');
+                    document.getElementById('year').setAttribute('required', 'true');
+                    document.getElementById('branch').setAttribute('required', 'true');
+                    
+                    facultyFields.classList.add('hidden');
+                    document.getElementById('departmentName').removeAttribute('required');
+
+                    proceedBtnText.innerText = "Proceed to Payment";
+                    proceedBtnIcon.setAttribute('data-lucide', 'arrow-right');
+                    lucide.createIcons();
                 }
             }
         });
@@ -250,19 +268,103 @@ function initEventsPage() {
         mainPosterContainer.classList.add('flex');
     });
 
-    // 3. Modal logic & Proceed Validation
+    // ==========================================
+    // SCRIPT URLS
+    // ==========================================
+    const eventScriptURLs = {
+        'smash-karts': 'https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec',
+        'dart-game': 'https://script.google.com/macros/s/AKfycbxxkn_Sg6HEnhji0xNT5H4hJr40NX6YePoI2vii7IxfJoyaP0Tmbua4B_UpvmLTDkwk/exec',
+        'Think_&_Ink': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
+    };
+
+    // 3. Main Form Proceed Button
     const proceedBtn = document.getElementById('proceed-btn');
     const regForm = document.getElementById('registration-form');
     const paymentModal = document.getElementById('payment-modal');
+    const directSubmitMsg = document.getElementById('direct-submit-msg');
     
     if(proceedBtn) {
-        proceedBtn.addEventListener('click', () => {
-            if (regForm.checkValidity()) paymentModal.classList.remove('hidden');
-            else regForm.reportValidity();
+        proceedBtn.addEventListener('click', async () => {
+            if (!regForm.checkValidity()) {
+                regForm.reportValidity();
+                return;
+            }
+
+            const eventId = selectedEventId.value;
+
+            // FACULTY DIRECT SUBMIT (NO PAYMENT)
+            if (eventId === 'dart-game') {
+                const scriptURL = eventScriptURLs[eventId];
+                if (!scriptURL || scriptURL.includes('YOUR_GOOGLE_SCRIPT_URL')) {
+                    alert('Configuration Error: Google Script URL is missing.');
+                    return;
+                }
+
+                proceedBtn.disabled = true;
+                proceedBtnText.innerText = "Submitting...";
+                proceedBtnIcon.classList.add('hidden');
+                directSubmitMsg.classList.add('hidden');
+
+                const payload = {
+                    event: eventId,
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    
+                    // Specific to Dart Game
+                    department: document.getElementById('departmentName').value,
+                    
+                    // Fill required backend fields with empty/NA data so script doesn't crash
+                    rollNumber: "Faculty",
+                    college: "JBIET",
+                    year: "Faculty",
+                    branch: "Faculty",
+                    transactionId: "N/A",
+                    fileName: "",
+                    mimeType: "",
+                    fileBase64: ""
+                };
+
+                try {
+                    await fetch(scriptURL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    directSubmitMsg.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-3">
+                            <i data-lucide="check-circle" class="w-8 h-8 text-green-500 mb-1"></i>
+                            <span class="font-bold">Registration Successful!</span>
+                        </div>
+                    `;
+                    directSubmitMsg.className = "mt-4 text-center rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
+                    lucide.createIcons();
+                    
+                    regForm.reset();
+                    setTimeout(() => { 
+                        backBtn.click();
+                        directSubmitMsg.classList.add('hidden');
+                    }, 3000);
+
+                } catch (error) {
+                    directSubmitMsg.innerHTML = "Error: Could not connect. Try again.";
+                    directSubmitMsg.className = "mt-4 text-center p-3 rounded-lg text-sm bg-red-900/60 border border-red-500 text-red-100 block";
+                } finally {
+                    proceedBtn.disabled = false;
+                    proceedBtnText.innerText = "Submit Registration";
+                    proceedBtnIcon.classList.remove('hidden');
+                }
+
+            } else {
+                // STUDENTS: OPEN PAYMENT MODAL
+                paymentModal.classList.remove('hidden');
+            }
         });
     }
 
-    // Modal Close Functions (Hides the message box as well)
+    // Modal Close Logic
     function closePaymentModal() {
         paymentModal.classList.add('hidden');
         const msgBox = document.getElementById('modal-form-message');
@@ -270,8 +372,6 @@ function initEventsPage() {
     }
 
     document.getElementById('close-modal-btn').addEventListener('click', closePaymentModal);
-    
-    // Also close modal if clicking the dark background overlay
     const modalOverlay = paymentModal.querySelector('.fixed.inset-0.bg-black\\/80');
     if(modalOverlay) {
         modalOverlay.addEventListener('click', closePaymentModal);
@@ -299,16 +399,9 @@ function initEventsPage() {
         });
     }
 
-    // 4. Final Form Submission (Google Sheets + Drive)
+    // 4. Final Form Submission (With Payment)
     const finalSubmitForm = document.getElementById('final-submit-form');
     
-    // IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT URLs
-    const eventScriptURLs = {
-        'smash-karts': 'https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec',
-        'dart-game': 'YOUR_GOOGLE_SCRIPT_URL_FOR_DART_GAME',
-        'tech-tambola': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
-    };
-
     if(finalSubmitForm) {
         finalSubmitForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -317,7 +410,7 @@ function initEventsPage() {
             const scriptURL = eventScriptURLs[eventId];
             
             if (!scriptURL || scriptURL.includes('YOUR_GOOGLE_SCRIPT_URL')) {
-                alert('Configuration Error: Google Script URL is missing for this event.');
+                alert('Configuration Error: Google Script URL is missing.');
                 return;
             }
 
@@ -354,17 +447,13 @@ function initEventsPage() {
                 };
 
                 try {
-                    // Send with no-cors to prevent browser security blocks
                     await fetch(scriptURL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8',
-                        },
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload)
                     });
                     
-                    // --- SUCCESS STATE (Requires Manual Close) ---
                     msgBox.innerHTML = `
                         <div class="flex flex-col items-center justify-center py-2">
                             <i data-lucide="check-circle" class="w-10 h-10 text-green-500 mb-2"></i>
@@ -375,16 +464,11 @@ function initEventsPage() {
                     msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
                     lucide.createIcons();
                     
-                    // Reset forms in the background
                     regForm.reset();
                     finalSubmitForm.reset();
-                    backBtn.click(); // Reset the background UI to list view
-                    
-                    // Note: No setTimeout here. Modal stays open until user clicks 'X'.
+                    backBtn.click(); 
 
                 } catch (error) {
-                    console.error(error);
-                    // --- ERROR STATE (Requires Manual Close) ---
                     msgBox.innerHTML = `
                         <div class="flex flex-col items-center justify-center py-2">
                             <i data-lucide="alert-circle" class="w-10 h-10 text-red-500 mb-2"></i>
