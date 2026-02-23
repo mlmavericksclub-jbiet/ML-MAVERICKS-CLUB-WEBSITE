@@ -181,10 +181,10 @@ function initEventsPage() {
     const proceedBtnIcon = document.getElementById('proceed-btn-icon');
     
     const posterImages = {
-        'smash-karts': 'smash.png',
-        'dart-game': 'dart.png',
-        'Think_&_Ink': 'tambola.png',
-        'neuro-debugs': 'neuro.png'
+        'smash-karts': './images/smash-karts-poster.png',
+        'dart-game': './images/DART-GAME.png',
+        'act-draw-decode': './images/act-draw-decode.png',
+        'neuro-debugs': './images/neuro_debugs_poster.png'
     };
 
     // 1. Handle Selection & Swap Layout
@@ -274,7 +274,7 @@ function initEventsPage() {
     const eventScriptURLs = {
         'smash-karts': 'https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec',
         'dart-game': 'https://script.google.com/macros/s/AKfycbxxkn_Sg6HEnhji0xNT5H4hJr40NX6YePoI2vii7IxfJoyaP0Tmbua4B_UpvmLTDkwk/exec',
-        'Think_&_Ink': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
+        'act-draw-decode': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
     };
 
     // 3. Main Form Proceed Button
