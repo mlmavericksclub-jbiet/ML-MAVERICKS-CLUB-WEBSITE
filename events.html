@@ -299,12 +299,12 @@
                 </button>
     
                 <h2 class="font-display text-2xl font-bold text-white mb-2 text-center block">Complete Registration</h2>
-                <p class="text-gray-400 mb-6 text-center text-sm">Scan the QR code or use the UPI ID to pay <span class="text-brand-cyan font-bold">₹50</span>.</p>
+                <p class="text-gray-400 mb-6 text-center text-sm">Scan the QR code or use the UPI ID to pay <span id="dynamic-price" class="text-brand-cyan font-bold">₹--</span>.</p>
                 
-                <div class="flex flex-col items-center">
-                    <div class="w-48 h-48 bg-white rounded-lg border-2 border-brand-cyan mb-4 flex items-center justify-center overflow-hidden">
-                        <img src="./images/smashkarts.jpg" alt="Payment QR" class="w-full h-full object-cover">
-                    </div>
+<div class="flex flex-col items-center">
+    <div class="w-48 h-48 bg-white rounded-lg border-2 border-brand-cyan mb-4 flex items-center justify-center overflow-hidden">
+        <img id="dynamic-qr-img" src="" alt="Payment QR" class="w-full h-full object-cover">
+    </div>
                     
                     <div class="flex items-center justify-center space-x-2 bg-gray-800 px-4 py-2 rounded-lg mb-6 w-full border border-gray-700">
                         <span class="text-gray-300 font-mono text-sm" id="upi-id">golisathwik555@oksbi</span>
