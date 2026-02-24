@@ -188,8 +188,8 @@ function initEventsPage() {
     };
 
     const eventPaymentDetails = {
-        'smash-karts': { price: '₹49', qr: './images/smash-pay.png' }, 
-        'tech-tambola': { price: '₹79', qr: './images/art-pay.png' }
+        'smash-karts': { price: '₹79', qr: './images/smash-pay.png' }, 
+        'act-draw-decode': { price: '₹49', qr: './images/art-pay.png' }
     };
 
     // 1. Handle Selection & Swap Layout
