@@ -187,6 +187,11 @@ function initEventsPage() {
         'neuro-debugs': './images/neuro_debugs_poster.png'
     };
 
+    const eventPaymentDetails = {
+        'smash-karts': { price: '₹49', qr: './images/art-pay.png' }, 
+        'tech-tambola': { price: '₹79', qr: './images/smash-pay.png' }
+    };
+
     // 1. Handle Selection & Swap Layout
     eventBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -197,6 +202,11 @@ function initEventsPage() {
             eventType.innerText = btn.getAttribute('data-type');
             selectedEventId.value = eventId;
             dynamicPoster.src = posterImages[eventId] || '';
+            // Update the Modal QR Code and Price dynamically
+            if (eventPaymentDetails[eventId]) {
+                document.getElementById('dynamic-price').innerText = eventPaymentDetails[eventId].price;
+                document.getElementById('dynamic-qr-img').src = eventPaymentDetails[eventId].qr;
+            }
 
             eventListContainer.classList.add('hidden');
             eventListContainer.classList.remove('block');
