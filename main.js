@@ -188,7 +188,7 @@ function initEventsPage() {
     };
 
     const eventPaymentDetails = {
-        'smash-karts': { price: '₹79', qr: './images/smash-pay.png' }, 
+        'smash-karts': { price: '₹79', qr: './images/sreeja-pay.jpg' }, 
         'act-draw-decode': { price: '₹49', qr: './images/art-pay.png' }
     };
 
