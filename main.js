@@ -165,6 +165,9 @@ function initEventsPage() {
     const mainPosterContainer = document.getElementById('main-poster-container');
     const formContainer = document.getElementById('form-container');
     const regClosedContainer = document.getElementById('registration-closed-container');
+    const statusTitle = document.getElementById('status-title');
+    const statusMessage = document.getElementById('status-message');
+    const statusIcon = document.getElementById('status-icon');
     
     // UI Elements
     const backBtn = document.getElementById('back-btn');
@@ -216,10 +219,31 @@ function initEventsPage() {
             eventPosterContainer.classList.remove('hidden');
             eventPosterContainer.classList.add('flex');
 
+            // --- NEURO DEBUGS: Coming Soon ---
             if (eventId === 'neuro-debugs') {
                 formContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('hidden');
                 regClosedContainer.classList.add('flex');
+                
+                statusTitle.innerText = "Coming Soon";
+                statusMessage.innerText = "Registrations for this event have not started yet. Please stay tuned for further updates.";
+                statusIcon.setAttribute('data-lucide', 'calendar-clock');
+                statusIcon.className = "w-20 h-20 text-brand-cyan mb-6 animate-pulse";
+                lucide.createIcons();
+
+            // --- SMASH KARTS: Registrations Closed ---
+            } else if (eventId === 'smash-karts') {
+                formContainer.classList.add('hidden');
+                regClosedContainer.classList.remove('hidden');
+                regClosedContainer.classList.add('flex');
+                
+                statusTitle.innerText = "Registrations Full";
+                statusMessage.innerText = "Thank you for the overwhelming response! All available slots for the Smash Karts game are now booked.";
+                statusIcon.setAttribute('data-lucide', 'lock'); 
+                statusIcon.className = "w-20 h-20 text-brand-pink mb-6";
+                lucide.createIcons();
+
+            // --- OTHER EVENTS: Show Form ---
             } else {
                 regClosedContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('flex');
@@ -227,24 +251,21 @@ function initEventsPage() {
 
                 // DART GAME: Faculty Only
                 if (eventId === 'dart-game') {
-                    // Hide Student Fields
                     studentFields.classList.add('hidden');
                     document.getElementById('rollNumber').removeAttribute('required');
                     document.getElementById('collegeName').removeAttribute('required');
                     document.getElementById('year').removeAttribute('required');
                     document.getElementById('branch').removeAttribute('required');
                     
-                    // Show Faculty Fields
                     facultyFields.classList.remove('hidden');
                     document.getElementById('departmentName').setAttribute('required', 'true');
                     
-                    // Change Button State
                     proceedBtnText.innerText = "Submit Registration";
                     proceedBtnIcon.setAttribute('data-lucide', 'check-circle');
                     lucide.createIcons();
 
+                // TECH TAMBOLA: Students + Faculty (Requires Payment)
                 } else {
-                    // STUDENTS: All other events
                     studentFields.classList.remove('hidden');
                     document.getElementById('rollNumber').setAttribute('required', 'true');
                     document.getElementById('collegeName').setAttribute('required', 'true');
