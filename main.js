@@ -192,7 +192,7 @@ function initEventsPage() {
 
     const eventPaymentDetails = {
         'smash-karts': { price: '₹79', qr: './images/sreeja-pay.jpg' }, 
-        'act-draw-decode': { price: '₹49', qr: './images/sreeja-pay.jpg' }
+        'act-draw-decode': { price: '₹49', qr: './images/abhi-pay.jpg' }
     };
 
     // 1. Handle Selection & Swap Layout
