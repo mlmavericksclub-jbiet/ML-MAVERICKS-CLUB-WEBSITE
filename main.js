@@ -232,7 +232,7 @@ function initEventsPage() {
                 lucide.createIcons();
 
             // --- SMASH KARTS: Registrations Closed ---
-            } else if (eventId === 'smash-karts') {
+            } else if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'tech-tambola') {
                 formContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('hidden');
                 regClosedContainer.classList.add('flex');
