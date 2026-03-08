@@ -187,12 +187,13 @@ function initEventsPage() {
         'smash-karts': './images/smash-karts-poster.png',
         'dart-game': './images/DART-GAME.png',
         'act-draw-decode': './images/act-draw-decode.png',
-        'neuro-debugs': './images/neuro_debugs_poster.png'
+        'neuro-debugs': './images/neuro-debug-poster.png'
     };
 
     const eventPaymentDetails = {
         'smash-karts': { price: '₹79', qr: './images/sreeja-pay.jpg' }, 
-        'act-draw-decode': { price: '₹49', qr: './images/abhi-pay.jpg' }
+        'act-draw-decode': { price: '₹49', qr: './images/abhi-pay.jpg' },
+        'neuro-debugs': { price: '₹100', qr: './images/neuro-pay.png' }  // Add your price and QR image path here
     };
 
     // 1. Handle Selection & Swap Layout
@@ -219,20 +220,8 @@ function initEventsPage() {
             eventPosterContainer.classList.remove('hidden');
             eventPosterContainer.classList.add('flex');
 
-            // --- NEURO DEBUGS: Coming Soon ---
-            if (eventId === 'neuro-debugs') {
-                formContainer.classList.add('hidden');
-                regClosedContainer.classList.remove('hidden');
-                regClosedContainer.classList.add('flex');
-                
-                statusTitle.innerText = "Coming Soon";
-                statusMessage.innerText = "Registrations for this event have not started yet. Please stay tuned for further updates.";
-                statusIcon.setAttribute('data-lucide', 'calendar-clock');
-                statusIcon.className = "w-20 h-20 text-brand-cyan mb-6 animate-pulse";
-                lucide.createIcons();
-
             // --- SMASH KARTS: Registrations Closed ---
-            } else if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'tech-tambola') {
+            if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'tech-tambola') {
                 formContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('hidden');
                 regClosedContainer.classList.add('flex');
@@ -305,7 +294,8 @@ function initEventsPage() {
     const eventScriptURLs = {
         'smash-karts': 'https://script.google.com/macros/s/AKfycbykH8h4VahOeqT3S-Jx3r095g9lFz8gyUvt42hy0RqiLes7k3y1r6V_SHAZHrveEDG_rA/exec',
         'dart-game': 'https://script.google.com/macros/s/AKfycbxxkn_Sg6HEnhji0xNT5H4hJr40NX6YePoI2vii7IxfJoyaP0Tmbua4B_UpvmLTDkwk/exec',
-        'act-draw-decode': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec'
+        'act-draw-decode': 'https://script.google.com/macros/s/AKfycbzFrJDYrd1pBrLW2xSsl06CVNms2-V_PNDHcJUrclKMsUe1S0jVctnZq86TSx9LKJ3J/exec',
+        'neuro-debugs': 'https://script.google.com/macros/s/AKfycbx0PBRV9uUPRnZuTogzxcXukYF0HjyMC9bgpyWCb9E5VG2tB5JlvljQyEvokN7Y4fSH/exec'  // Replace with your deployed Apps Script URL
     };
 
     // 3. Main Form Proceed Button
