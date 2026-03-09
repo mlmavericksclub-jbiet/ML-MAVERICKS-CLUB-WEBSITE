@@ -187,7 +187,7 @@ function initEventsPage() {
         'smash-karts': './images/smash-karts-poster.png',
         'dart-game': './images/DART-GAME.png',
         'act-draw-decode': './images/act-draw-decode.png',
-        'neuro-debugs': './images/neuro-debug-poster.png'
+        'neuro-debugs': './images/neuro-debug-poster.jpg'
     };
 
     const eventPaymentDetails = {
@@ -347,31 +347,45 @@ function initEventsPage() {
                 };
 
                 try {
-                    await fetch(scriptURL, {
+                    const response = await fetch(scriptURL, {
                         method: 'POST',
-                        mode: 'no-cors',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload)
                     });
-                    
-                    directSubmitMsg.innerHTML = `
-                        <div class="flex flex-col items-center justify-center p-3">
-                            <i data-lucide="check-circle" class="w-8 h-8 text-green-500 mb-1"></i>
-                            <span class="font-bold">Registration Successful!</span>
-                        </div>
-                    `;
-                    directSubmitMsg.className = "mt-4 text-center rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
-                    lucide.createIcons();
-                    
-                    regForm.reset();
-                    setTimeout(() => { 
-                        backBtn.click();
-                        directSubmitMsg.classList.add('hidden');
-                    }, 3000);
+
+                    if (response.ok) {
+                        directSubmitMsg.innerHTML = `
+                            <div class="flex flex-col items-center justify-center p-3">
+                                <i data-lucide="check-circle" class="w-8 h-8 text-green-500 mb-1"></i>
+                                <span class="font-bold">Registration Successful!</span>
+                            </div>
+                        `;
+                        directSubmitMsg.className = "mt-4 text-center rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
+                        lucide.createIcons();
+
+                        regForm.reset();
+                        setTimeout(() => {
+                            backBtn.click();
+                            directSubmitMsg.classList.add('hidden');
+                        }, 3000);
+                    } else {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
 
                 } catch (error) {
-                    directSubmitMsg.innerHTML = "Error: Could not connect. Try again.";
-                    directSubmitMsg.className = "mt-4 text-center p-3 rounded-lg text-sm bg-red-900/60 border border-red-500 text-red-100 block";
+                    console.error('Faculty submission error:', error);
+                    let errorMessage = "Please check your connection and try again.";
+                    if (error.message.includes('CORS') || error.message.includes('NetworkError')) {
+                        errorMessage = "Server configuration issue. Your data may have been submitted - please contact support.";
+                    }
+                    directSubmitMsg.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-3">
+                            <i data-lucide="alert-circle" class="w-8 h-8 text-red-500 mb-1"></i>
+                            <span class="font-bold">Registration Failed</span>
+                            <span class="text-xs text-red-200">${errorMessage}</span>
+                        </div>
+                    `;
+                    directSubmitMsg.className = "mt-4 text-center rounded-lg text-sm bg-red-900/60 border border-red-500 text-red-100 block";
                 } finally {
                     proceedBtn.disabled = false;
                     proceedBtnText.innerText = "Submit Registration";
@@ -468,33 +482,48 @@ function initEventsPage() {
                 };
 
                 try {
-                    await fetch(scriptURL, {
+                    const response = await fetch(scriptURL, {
                         method: 'POST',
-                        mode: 'no-cors',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload)
                     });
-                    
-                    msgBox.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-2">
-                            <i data-lucide="check-circle" class="w-10 h-10 text-green-500 mb-2"></i>
-                            <span class="font-bold text-lg">Registration Successful!</span>
-                            <span class="text-xs text-green-200 mt-1">Your details have been securely recorded. You may close this window.</span>
-                        </div>
-                    `;
-                    msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
-                    lucide.createIcons();
-                    
-                    regForm.reset();
-                    finalSubmitForm.reset();
-                    backBtn.click(); 
+
+                    if (response.ok) {
+                        msgBox.innerHTML = `
+                            <div class="flex flex-col items-center justify-center py-2">
+                                <i data-lucide="check-circle" class="w-10 h-10 text-green-500 mb-2"></i>
+                                <span class="font-bold text-lg">Registration Successful!</span>
+                                <span class="text-xs text-green-200 mt-1">Your details have been securely recorded. You may close this window.</span>
+                                ${eventId === 'neuro-debugs' ? `
+                                <button onclick="window.open('https://chat.whatsapp.com/EhZNsgSy8BuInnU4ES3rTw?mode=gi_t', '_blank')"
+                                        class="mt-4 w-full inline-flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all duration-300">
+                                    <i data-lucide="message-circle" class="w-5 h-5 mr-2"></i>
+                                    Join WhatsApp Group
+                                </button>
+                                ` : ''}
+                            </div>
+                        `;
+                        msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-green-900/60 border border-green-500 text-green-100 block";
+                        lucide.createIcons();
+
+                        regForm.reset();
+                        finalSubmitForm.reset();
+                        backBtn.click();
+                    } else {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    } 
 
                 } catch (error) {
+                    console.error('Submission error:', error);
+                    let errorMessage = "Please check your internet connection and try again.";
+                    if (error.message.includes('CORS') || error.message.includes('NetworkError')) {
+                        errorMessage = "Server configuration issue. Your data may have been submitted - please contact support to verify.";
+                    }
                     msgBox.innerHTML = `
                         <div class="flex flex-col items-center justify-center py-2">
                             <i data-lucide="alert-circle" class="w-10 h-10 text-red-500 mb-2"></i>
-                            <span class="font-bold text-lg">Form Not Submitted</span>
-                            <span class="text-xs text-red-200 mt-1">Please check your internet connection and try again.</span>
+                            <span class="font-bold text-lg">Registration Failed</span>
+                            <span class="text-xs text-red-200 mt-1">${errorMessage}</span>
                         </div>
                     `;
                     msgBox.className = "mt-4 text-center p-3 rounded-lg text-sm bg-red-900/60 border border-red-500 text-red-100 block";
