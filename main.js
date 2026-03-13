@@ -193,7 +193,7 @@ function initEventsPage() {
     const eventPaymentDetails = {
         'smash-karts': { price: '₹79', qr: './images/sreeja-pay.jpg' }, 
         'act-draw-decode': { price: '₹49', qr: './images/abhi-pay.jpg' },
-        'neuro-debugs': { price: '₹100', qr: './images/neuro-pay.png' }  // Add your price and QR image path here
+        'neuro-debugs': { price: '₹100', qr: './images/sreeja-debug-pay.jpg' }  // Add your price and QR image path here
     };
 
     // 1. Handle Selection & Swap Layout
@@ -221,13 +221,13 @@ function initEventsPage() {
             eventPosterContainer.classList.add('flex');
 
             // --- SMASH KARTS: Registrations Closed ---
-            if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'tech-tambola') {
+            if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'act-draw-decode' || eventId === 'neuro-debugs') {
                 formContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('hidden');
                 regClosedContainer.classList.add('flex');
                 
-                statusTitle.innerText = "Registrations Full";
-                statusMessage.innerText = "Thank you for the overwhelming response! All available slots for the Smash Karts game are now booked.";
+                statusTitle.innerText = "Registrations Closed";
+                statusMessage.innerText = "Registrations are now closed for this event.";
                 statusIcon.setAttribute('data-lucide', 'lock'); 
                 statusIcon.className = "w-20 h-20 text-brand-pink mb-6";
                 lucide.createIcons();
