@@ -221,7 +221,7 @@ function initEventsPage() {
             eventPosterContainer.classList.add('flex');
 
             // --- SMASH KARTS: Registrations Closed ---
-            if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'act-draw-decode' || eventId === 'neuro-debugs') {
+            if (eventId === 'smash-karts' || eventId === 'dart-game' || eventId === 'tech-tambola'|| eventId === 'neuro-debugs') {
                 formContainer.classList.add('hidden');
                 regClosedContainer.classList.remove('hidden');
                 regClosedContainer.classList.add('flex');
