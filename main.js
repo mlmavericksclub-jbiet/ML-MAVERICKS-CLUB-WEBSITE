@@ -193,7 +193,7 @@ function initEventsPage() {
     const eventPaymentDetails = {
         'smash-karts': { price: '₹79', qr: './images/sreeja-pay.jpg' }, 
         'act-draw-decode': { price: '₹49', qr: './images/abhi-pay.jpg' },
-        'neuro-debugs': { price: '₹100', qr: './images/neuro-pay.png' }  // Add your price and QR image path here
+        'neuro-debugs': { price: '₹100', qr: './images/sreeja-debug-pay.jpg' }  // Add your price and QR image path here
     };
 
     // 1. Handle Selection & Swap Layout
